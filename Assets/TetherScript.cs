@@ -124,7 +124,7 @@ public class TetherScript : MonoBehaviour
 			Grid += Tiles[x].GetComponentInChildren<TextMesh>().text;
 			if (x % 4 == 3)
 			{
-				Debug.LogFormat("[Numerical Knight Movement #{0}] {1}", moduleId, Grid);
+				Debug.LogFormat("[Tether #{0}] {1}", moduleId, Grid);
 				Grid = "";
 			}
 		}
@@ -211,7 +211,7 @@ public class TetherScript : MonoBehaviour
 		Module.HandlePass();
 		MusicPlayer.clip = SFX[1];
 		MusicPlayer.Play();
-		string[] TheVoidSpeaks = {"WE  WILLCOMEBACK", "THE VOIDWILLLIVE", "YOU WILLSEE SOON", "YOU HAVENOT WON ", "THISWILLNOT END ", "COMEAND JOINUS  ", "NO  ONE TO  HELP", "YOU DID THIS    ", "WE  SEE YOU     ", "YOU ARE NOT SAFE", "YOU WILLBE  BACK", "YOUREYESONLYLIE ", "YOU WILLFEARUS  ", "OUR TIMEWILLCOME", "YOURLIFEWILLEND "};
+		string[] TheVoidSpeaks = {"WE  WILLCOMEBACK", "THE VOIDWILLLIVE", "YOU WILLSEE SOON", "YOU HAVENOT WON ", "THISWILLNOT END ", "COMEAND JOINUS  ", "NO  ONE TO  HELP", "YOU DID THIS    ", "WE  SEE YOU     ", "YOU ARE NOT SAFE", "YOU WILLBE  BACK", "YOUREYESONLYLIE ", "YOU WILLFEARUS  ", "OUR TIMEWILLCOME", "YOURLIFEWILLEND ", "DO  NOT LOOKBACK", "NO  ONE IS  HERE", "THISIS  THE END "};
 		int ChosenDestiny = UnityEngine.Random.Range(0,TheVoidSpeaks.Length);
 		while (MusicPlayer.isPlaying)
 		{
