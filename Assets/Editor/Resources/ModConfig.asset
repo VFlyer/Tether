@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 615501dbe4f3fe94fbf4b564abb10237, type: 3}
+  m_Name: ModConfig
+  m_EditorClassIdentifier: 
+  id: Tether
+  title: Tether
+  author: BigCrunch22
+  description: "\"Together, they are stronger. You need to unbind their links.\"\r\n\r\nIdea/Implementor
+    - BigCrunch22\r\n\r\nTP Supported!\r\n\r\nIf someone wants to add TP Support/Logging/Anything
+    useful, you have my approval for that."
+  version: 1.0
+  outputFolder: build
+  previewImage: {fileID: 2800000, guid: f66d89168ce70144db6c725bc629e241, type: 3}
