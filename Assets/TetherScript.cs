@@ -248,7 +248,7 @@ public class TetherScript : MonoBehaviour
 				yield return "sendtochaterror An invalid coordinate was detected. The command was not continued.";
 				yield break;
 			}
-			
+			yield return "solve";
 			Tiles[Array.IndexOf(CoordinatesCodename, parameters[x].ToUpper())].OnInteract();
 			yield return new WaitForSecondsRealtime(0.1f);
 		}
