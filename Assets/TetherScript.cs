@@ -103,6 +103,8 @@ public class TetherScript : MonoBehaviour
             }
             Debug.LogFormat("[Tether #{0}] The word chain you sent: {1}", moduleId, WordChain);
 
+            List<string> CheckForDupes = new List<string>();
+            CheckForDupes.Add(SelectedWords[0]); CheckForDupes.Add(SelectedWords[5]);
             for (int a = 1; a < SelectedWords.Length - 1; a++)
             {
                 string CompareOne = "", CompareTwo = "", CompareThree = "";
@@ -116,7 +118,7 @@ public class TetherScript : MonoBehaviour
                     yield return new WaitForSecondsRealtime(0.25f);
                 }
 
-                if (!CompareTwo.EqualsAny(Selection) || CompareOne.Remove(0, 2) != CompareTwo.Remove(3) || CompareTwo.Remove(0, 2) != CompareThree.Remove(3))
+                if (!CompareTwo.EqualsAny(Selection) || CompareOne.Remove(0, 2) != CompareTwo.Remove(3) || CompareTwo.Remove(0, 2) != CompareThree.Remove(3) || CompareTwo.EqualsAny(CheckForDupes.ToArray()))
                 {
                     Debug.LogFormat("[Tether #{0}] The word {1} did not bind. The module strikes.", moduleId, CompareTwo);
                     Module.HandleStrike();
@@ -131,6 +133,7 @@ public class TetherScript : MonoBehaviour
                         LettersRepresentation[(a * 5) + x].color = new Color(24f / 255f, 128f / 255f, 0f);
                     }
                     Audio.PlaySoundAtTransform(SFX[0].name, transform);
+                    CheckForDupes.Add(CompareTwo);
                 }
 
             }
@@ -184,7 +187,7 @@ public class TetherScript : MonoBehaviour
                 if (RandomSelection.Count() == 0)
                     break;
                 SelectedWords[a] = RandomSelection[UnityEngine.Random.Range(0, RandomSelection.Count())];
-                if (SelectedWords[a].EqualsAny(Comparer))
+                if (SelectedWords[a].EqualsAny(Comparer.ToArray()))
                     break;
                 Comparer.Add(SelectedWords[a]);
                 if (a == SelectedWords.Length - 1)
