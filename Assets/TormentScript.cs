@@ -24,11 +24,11 @@ public class TormentScript : MonoBehaviour
 	int[] NumberBasis = new int[16], NumberComparer = new int[16], PressAmount = new int[16], PressedNumbers = {-1, -1, -1, -1};
 	string[] CoordinatesCodename = {"A1", "B1", "C1", "D1", "A2", "B2", "C2", "D2", "A3", "B3", "C3", "D3", "A4", "B4", "C4", "D4"};
 	bool Interactable = false, Touchable = true;
-	int BaseNumber = 0, PhaseNumber = 0, PressNumber = 0;
+	int BaseNumber = 0, PhaseNumber = 0, PressNumber = 0, NumberOfSeconds = 10;
 	string CodeWord = "LOOK";
-	
+
 	//Logging
-    static int moduleIdCounter = 1;
+	static int moduleIdCounter = 1;
     int moduleId;
     private bool ModuleSolved;
 	
@@ -116,7 +116,9 @@ public class TormentScript : MonoBehaviour
 			DebugString2 = DebugString2 + CoordinatesToPress[x] + (x < CoordinatesToPress.Count() - 1 ? ", " : "");
 		}
 		Debug.LogFormat("[Torment #{0}] The tiles should be pressed (based on my algorithm) are: {1}", moduleId, DebugString2);
-	}
+		NumberOfSeconds = 10;
+		StartCoroutine(Ten());
+    }
 	
 	void DifferentFunctions()
 	{
@@ -141,7 +143,7 @@ public class TormentScript : MonoBehaviour
 			
 			else if (PhaseNumber == 1)
 			{
-				string CodeWord = "STOP";
+				CodeWord = "STOP";
 				for (int x = 0; x < 4; x++)
 				{
 					UNDOING[x].text = CodeWord[x].ToString();
@@ -154,7 +156,7 @@ public class TormentScript : MonoBehaviour
 				PhaseNumber = 2;
 			}
 			
-			else if (PhaseNumber == 2)
+			else if (PhaseNumber == 2 && NumberOfSeconds == 0)
 			{
 				CodeWord = "LOOK";
 				for (int x = 0; x < 4; x++)
@@ -267,9 +269,18 @@ public class TormentScript : MonoBehaviour
 			}
 		}
 	}
-	
-	//twitch plays
-    #pragma warning disable 414
+
+	IEnumerator Ten()
+	{
+		while (NumberOfSeconds != 0)
+		{
+            yield return new WaitForSecondsRealtime(1f);
+			NumberOfSeconds--;
+        }
+	}
+
+    //twitch plays
+#pragma warning disable 414
     private readonly string TwitchHelpMessage = @"To press the button on top, use the command !{0} look/fall/stop | To press a certain coordinate on the module, use the command !{0} press [A-D][1-4]";
     #pragma warning restore 414
 	
@@ -284,7 +295,14 @@ public class TormentScript : MonoBehaviour
 				yield return "sendtochaterror You can not interact with the button currently. Command ignored.";
 				yield break;
 			}
-			UNDO.OnInteract();
+
+            if (CodeWord == "STOP" && NumberOfSeconds != 0)
+            {
+                yield return "sendtochaterror You can not leave yet. Command ignored.";
+                yield break;
+            }
+
+            UNDO.OnInteract();
 		}
 
 		if (Regex.IsMatch(parameters[0], @"^\s*press\s*$", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant))
@@ -307,7 +325,7 @@ public class TormentScript : MonoBehaviour
                 yield break;
             }
 
-            if (PhaseNumber == 2 && PressNumber == 2)
+            if (CodeWord == "STOP" && PressNumber == 2)
             {
                 yield return "solve";
             }
