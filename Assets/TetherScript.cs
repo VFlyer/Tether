@@ -16,7 +16,7 @@ public class TetherScript : MonoBehaviour
     public TextMesh[] LettersRepresentation;
     public AudioClip[] SFX;
     public TextAsset FiveLetterWords;
-
+    public GameObject HiddenSelectable;
 
     bool focused, Interactable = true;
 
@@ -47,6 +47,7 @@ public class TetherScript : MonoBehaviour
         GetComponent<KMSelectable>().OnDefocus += delegate () { focused = false; };
         if (Application.isEditor)
             focused = true;
+        HiddenSelectable.SetActive(false);
     }
 
     void Update()
