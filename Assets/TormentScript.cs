@@ -108,7 +108,7 @@ public class TormentScript : MonoBehaviour
 
             for (int y = 0; y < TormentRange[x].Length; y++)
                 loggingInts[TormentRange[x][y]] = NumberAddition[x][y];
-            
+
             for (int y = 0; y < 4; y++)
                 DebugString += Enumerable.Range(y * 4, 4).Select(z => loggingInts[z]).Join("") + (y != 3 ? "|" : "");
 
@@ -285,12 +285,11 @@ public class TormentScript : MonoBehaviour
 
     //twitch plays
 #pragma warning disable 414
-    private readonly string TwitchHelpMessage = @"To press the button on top, use the command !{0} look/fall/stop | To press a certain coordinate on the module, use the command !{0} press [A-D][1-4]";
+    private readonly string TwitchHelpMessage = "To press the button on top, use the command \"!{0} look/fall/stop\" | To press a certain coordinate on the module (A - D top to bottom, 1 - 4 left to right), use the command \"!{0} press [A-D][1-4]\" Multiple coordinates can be specified.";
 #pragma warning restore 414
 
     IEnumerator ProcessTwitchCommand(string command)
     {
-        yield return null;
         string[] parameters = command.Split(' ');
         if (command.ToUpper() == CodeWord)
         {
@@ -305,13 +304,13 @@ public class TormentScript : MonoBehaviour
                 yield return "sendtochaterror You can not leave yet. Command ignored.";
                 yield break;
             }
-
+            yield return null;
             UNDO.OnInteract();
         }
 
         if (Regex.IsMatch(parameters[0], @"^\s*press\s*$", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant))
         {
-            if (parameters.Length != 2)
+            if (parameters.Length < 2)
             {
                 yield return "sendtochaterror Invalid parameter length. Command ignored.";
                 yield break;
@@ -322,19 +321,50 @@ public class TormentScript : MonoBehaviour
                 yield return "sendtochaterror You can not interact with the tiles currently. Command ignored.";
                 yield break;
             }
-
-            if (!parameters[1].ToUpper().EqualsAny(CoordinatesCodename))
+            var possiblePresses = new List<KMSelectable>();
+            foreach (var possibleCoord in parameters.Skip(1))
             {
-                yield return "sendtochaterror An invalid coordinate was detected. The command was not continued.";
-                yield break;
+                var possibleCoordUpper = possibleCoord.ToUpper();
+                if (!possibleCoordUpper.EqualsAny(CoordinatesCodename))
+                {
+                    yield return string.Format("sendtochaterror Invalid coordinate \"{0}\" was detected. The command was not continued.", possibleCoordUpper);
+                    yield break;
+                }
+                possiblePresses.Add(Tiles[CoordinatesCodename.ToList().IndexOf(possibleCoordUpper)]);
             }
-
-            if (CodeWord == "STOP" && PressNumber == 2)
+            foreach (var aButton in possiblePresses)
             {
-                yield return "solve";
+                yield return null;
+                if (CodeWord == "STOP" && PressNumber == 2)
+                    yield return "solve";
+                aButton.OnInteract();
+                yield return new WaitForSeconds(0.1f);
             }
-            Tiles[Array.IndexOf(CoordinatesCodename, parameters[1].ToUpper())].OnInteract();
         }
     }
 
+    IEnumerator TwitchHandleForcedSolve()
+    {
+        waitForReset:
+        while (NumberOfSeconds > 0)
+            yield return true;
+        while (CodeWord != "STOP")
+        {
+            UNDO.OnInteract();
+            yield return new WaitForSeconds(0.1f);
+        }
+        if (PressNumber > 0 && !PressedNumbers.Take(PressNumber).All(a => CoordinatesToPress.Contains(CoordinatesCodename[a])))
+        {
+            UNDO.OnInteract();
+            goto waitForReset;
+        }
+        while (PressNumber < 3)
+        {
+            var remainingCoords = CoordinatesToPress.Select(a => CoordinatesCodename.ToList().IndexOf(a)).Except(PressedNumbers.Take(PressNumber));
+            Tiles[remainingCoords.FirstOrDefault()].OnInteract();
+            yield return new WaitForSeconds(0.1f);
+        }
+        while (!ModuleSolved)
+            yield return true;
+    }
 }

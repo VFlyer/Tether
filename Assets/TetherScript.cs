@@ -212,7 +212,6 @@ public class TetherScript : MonoBehaviour
 
     IEnumerator ProcessTwitchCommand(string command)
     {
-        yield return null;
         string[] parameters = command.Split(' ');
         if (Regex.IsMatch(parameters[0], @"^\s*submit\s*$", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant))
         {
@@ -243,7 +242,7 @@ public class TetherScript : MonoBehaviour
                     yield break;
                 }
             }
-
+            yield return null;
             while (Filled != 0)
                 BackSpace();
 
@@ -260,5 +259,28 @@ public class TetherScript : MonoBehaviour
             yield return "solve";
             EnterBypass();
         }
+    }
+
+    IEnumerator TwitchHandleForcedSolve()
+    {
+        while (Filled > 0)
+        {
+            BackSpace();
+            yield return null;
+        }
+        var possibleSubmission = SelectedWords.Skip(1).Take(4).ToList();
+
+        for (int x = 0; x < possibleSubmission.Count; x++)
+        {
+            var curWord = possibleSubmission[x];
+            for (int y = 0; y < curWord.Length; y++)
+            {
+                Type(Qwerty.Join("").IndexOf(curWord[y]));
+                yield return new WaitForSecondsRealtime(0.1f);
+            }
+        }
+        EnterBypass();
+        while (!ModuleSolved)
+            yield return true;
     }
 }
